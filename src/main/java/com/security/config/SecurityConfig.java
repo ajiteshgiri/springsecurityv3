@@ -1,11 +1,15 @@
 package com.security.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,7 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
+    @Autowired
+    private UserDetailsService userDetailsService;
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf().disable()
@@ -31,25 +36,30 @@ public class SecurityConfig {
 
         return http.build();
     }
-    @Bean
-    public UserDetailsService userDetailsService(){
-        UserDetails details = User.builder()
-                .username("ajitesh")
-                .password(passwordEncoder().encode("12345"))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN")
-                .build();
-        return  new InMemoryUserDetailsManager(details, admin);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        UserDetails details = User.builder()
+//                .username("ajitesh")
+//                .password(passwordEncoder().encode("12345"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN")
+//                .build();
+//        return  new InMemoryUserDetailsManager(details, admin);
+//    }
 
     @Bean
    public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
+        return configuration.getAuthenticationManager();
+    }
 }
